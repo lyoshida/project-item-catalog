@@ -1,0 +1,19 @@
+<html>
+
+    <head>
+        <title>Item Catalog</title>
+        <!--<link rel="stylesheet" href="../static/semantic-ui/semantic.min.css">-->
+        <link rel="stylesheet" href="{{ url_for('static', filename='semantic-ui/semantic.min.css')}}">
+    </head>
+
+    <body>
+
+        <div class="ui container">
+            {% block content %}{% endblock %}
+        </div>
+
+        <script src="{{ url_for('static', filename='semantic-ui/semantic.min.js')}}"></script>
+    </body>
+
+
+</html>

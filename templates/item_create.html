@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Create Item</h1>
+
+    <form action="{{ url_for('create_item', category_id=category.id) }}" method="post">
+        <div class="ui form">
+
+            <div class="field">
+                <input type="text" name='item-name' placeholder="item name">
+            </div>
+
+            <div class="field">
+                <textarea name="item-description" id="" cols="50" rows="10"></textarea>
+            </div>
+
+            <button class="ui green button">Save</button>
+        </div>
+    </form>
+
+    {% if error %}
+        <div class="ui negative message">
+            <div class="header">{{ error }}</div>
+            <p>{{ message }}</p>
+        </div>
+    {% endif %}
+
+{% endblock %}

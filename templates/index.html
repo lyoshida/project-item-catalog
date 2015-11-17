@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>Product catalog</h1>
+
+    <div class="ui grid">
+
+        <div class="four wide column">
+            <h2>Categories</h2>
+
+            <div class="cat-list">
+                {% for cat in categories %}
+                <div class="cat-item">
+                    <a href="{{ url_for('view_category', category_id=cat.id) }}">{{ cat.name }}</a>
+                    <span class="cat-item-options hidden">(<a href="">edit</a> | <a href="">delete</a>)</span>
+                </div>
+                {% endfor %}
+
+            </div>
+
+            <a href="{{ url_for('create_category') }}" class="ui tiny blue button">+ category</a>
+        </div>
+
+        <div class="twelve wide column">
+            {% block catalog_content %}
+                <h2>Most recent</h2>
+
+
+
+            {% endblock %}
+        </div>
+
+    </div>
+{% endblock %}

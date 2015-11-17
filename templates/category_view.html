@@ -1,0 +1,14 @@
+{% extends 'index.html' %}
+
+
+{% block catalog_content %}
+
+    <h2>Items in {{ category.name }}</h2>
+
+    {% for item in items %}
+    <p><a href="{{ url_for('view_item', item_id=item.id)}}">{{ item.name }}</a></p>
+    {% endfor %}
+
+    <a href="{{ url_for('create_item', category_id=category.id) }}" class="ui tiny blue button">+ item</a>
+
+{% endblock %}
