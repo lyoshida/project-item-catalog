@@ -16,11 +16,21 @@
                 </div>
                 <a href="{{ url_for('index') }}" class="item">Home</a>
 
+                {% if not session.username %}
                 <div class="right menu">
                     <div class="ui right aligned item">
-                        <a href="">Login</a>
+                        <a href="{{ url_for('login') }}">Login</a>
                     </div>
                 </div>
+                {% else %}
+                <div class="right menu">
+                    <div class="ui right aligned item">
+                        Hi, {{ session.username }}
+                        <a href="#">Logout</a>
+                    </div>
+                </div>
+
+                {% endif %}
 
             </div>
 
@@ -30,8 +40,9 @@
             {% block content %}{% endblock %}
         </div>
 
-        <script src="{{ url_for('static', filename='semantic-ui/semantic.min.js')}}"></script>
         <script src="{{ url_for('static', filename='jquery/jquery.min.js')}}"></script>
+        <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+        <script src="{{ url_for('static', filename='semantic-ui/semantic.min.js')}}"></script>
         <script src="{{ url_for('static', filename='script.js')}}"></script>
     </body>
 

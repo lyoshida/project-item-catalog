@@ -8,4 +8,5 @@
       $(this).find('.cat-item-options').addClass('hidden');
   });
 
+
 })();
