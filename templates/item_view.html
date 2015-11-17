@@ -4,8 +4,11 @@
 {% block catalog_content %}
     <h2>Items Details</h2>
 
+    {% if session.username %}
     <a href="{{ url_for('edit_item', item_id=item.id) }}" class="ui tiny blue button">edit this item</a>
     <a href="{{ url_for('delete_item', item_id=item.id) }}" class="ui tiny red button">delete this item</a>
+    {% endif %}
+
     <h3>{{ item.name }}</h3>
 
     <p>{{ item.description }}</p>

@@ -1,3 +1,5 @@
+# coding: utf-8
+
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 
 from flask import session as login_session
@@ -31,6 +33,9 @@ app = Flask(__name__)
 
 @app.route('/login')
 def login():
+    """
+        Renders login page and create a session variable (security)
+    """
     state = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase) for x in xrange(32))
     login_session['state'] = state
 
@@ -39,6 +44,10 @@ def login():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    """
+        User login with Google+
+    """
+
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -94,15 +103,18 @@ def gconnect():
         return response
 
     # Store the access token in the session for later use.
-    login_session['credentials'] = credentials.access_token
+    login_session['credentials'] = access_token
     login_session['gplus_id'] = gplus_id
 
     # Get user info
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
-    params = {'access_token': credentials, 'alt': 'json'}
+    print credentials
+    params = {'access_token': access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
 
     data = answer.json()
+
+    print data
 
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
@@ -111,9 +123,43 @@ def gconnect():
     return redirect(url_for('index'))
 
 
+@app.route('/logout')
+def logout():
+    """
+        Log out the user by removing session variables and revoking tokens.
+    """
+
+    access_token = login_session['credentials']
+    if access_token is None:
+        print 'Access Token is None'
+        response = make_response(json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['credentials']
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+    print 'result is '
+    print result
+    if result['status'] == '200':
+        del login_session['credentials']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return redirect(url_for('index'))
+    else:
+        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+
 @app.route('/')
 def index():
-
+    """
+        Renders main page
+    """
     categories = session.query(Category).order_by('name')
     items = session.query(Item).order_by('-id')
     return render_template('index.html', categories=categories, items=items)
@@ -135,7 +181,9 @@ def view_category(category_id):
 
 @app.route('/category/create', methods=['GET', 'POST'])
 def create_category():
-
+    """
+        Form to create a new category
+    """
     if request.method == 'GET':
 
         return render_template('category_create.html')
@@ -156,7 +204,9 @@ def create_category():
 
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 def edit_category(category_id):
-
+    """
+        Form to edit a new category
+    """
     category = session.query(Category).filter_by(id=category_id).one()
 
     if request.method == 'GET':
@@ -179,7 +229,9 @@ def edit_category(category_id):
 
 @app.route('/category/<int:category_id>/delete')
 def delete_category(category_id):
-
+    """
+        Deletes a category
+    """
     category = session.query(Category).filter_by(id=category_id).one()
     session.delete(category)
     session.commit()
@@ -189,6 +241,9 @@ def delete_category(category_id):
 
 @app.route('/item/<int:item_id>')
 def view_item(item_id):
+    """
+        Show details for an item
+    """
     categories = session.query(Category).all()
     item = session.query(Item).filter_by(id=item_id).one()
     category = session.query(Category).filter_by(id=item.category_id).one()
@@ -201,7 +256,9 @@ def view_item(item_id):
 
 @app.route('/category/<int:category_id>/item/create', methods=['GET', 'POST'])
 def create_item(category_id):
-
+    """
+        Create a new item
+    """
     category = session.query(Category).filter_by(id=category_id).one()
 
     if request.method == 'GET':
@@ -228,6 +285,9 @@ def create_item(category_id):
 
 @app.route('/item/<int:item_id>/edit', methods=['GET', 'POST'])
 def edit_item(item_id):
+    """
+        Edit an item
+    """
     item = session.query(Item).filter_by(id=item_id).one()
 
     if request.method == 'GET':
@@ -251,7 +311,9 @@ def edit_item(item_id):
 
 @app.route('/item/<int:item_id>/delete')
 def delete_item(item_id):
-
+    """
+        Delete an item
+    """
     item = session.query(Item).filter_by(id=item_id).one()
 
     session.delete(item)
