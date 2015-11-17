@@ -9,24 +9,30 @@
         <div class="four wide column">
             <h2>Categories</h2>
 
+            <a href="{{ url_for('create_category') }}" class="ui tiny blue button">+ category</a>
+
             <div class="cat-list">
                 {% for cat in categories %}
                 <div class="cat-item">
                     <a href="{{ url_for('view_category', category_id=cat.id) }}">{{ cat.name }}</a>
-                    <span class="cat-item-options hidden">(<a href="">edit</a> | <a href="">delete</a>)</span>
+                    <span class="cat-item-options hidden">(
+                        <a href="{{ url_for('edit_category', category_id=cat.id) }}">edit</a> |
+                        <a href="{{ url_for('delete_category', category_id=cat.id) }}">delete</a>)
+                    </span>
                 </div>
                 {% endfor %}
 
             </div>
 
-            <a href="{{ url_for('create_category') }}" class="ui tiny blue button">+ category</a>
         </div>
 
         <div class="twelve wide column">
             {% block catalog_content %}
                 <h2>Most recent</h2>
 
-
+                {% for item in items %}
+                <p><a href="{{ url_for('view_item', item_id=item.id)}}">{{ item.name }}</a></p>
+                {% endfor %}
 
             {% endblock %}
         </div>

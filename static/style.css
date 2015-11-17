@@ -1,0 +1,9 @@
+/* General styles */
+
+.hidden {
+  display: none;
+}
+
+.cat-list {
+  margin-top: 20px;
+}

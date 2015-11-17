@@ -18,18 +18,21 @@ app = Flask(__name__)
 @app.route('/')
 def index():
 
-    categories = session.query(Category).all()
-    return render_template('index.html', categories=categories)
+    categories = session.query(Category).order_by('name')
+    items = session.query(Item).order_by('-id')
+    return render_template('index.html', categories=categories, items=items)
 
 
 @app.route('/category/<int:category_id>')
 def view_category(category_id):
 
     category = session.query(Category).filter_by(id=category_id).one()
+    categories = session.query(Category).all()
 
     items = session.query(Item).filter_by(category_id=category_id)
 
     return render_template('category_view.html',
+                           categories=categories,
                            category=category,
                            items=items)
 
@@ -55,23 +58,50 @@ def create_category():
             return redirect(url_for('index'))
 
 
-@app.route('/category/<int:category_id>/edit')
-def edit_category():
-    return render_template('category_edit.html')
+@app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
+def edit_category(category_id):
+
+    category = session.query(Category).filter_by(id=category_id).one()
+
+    if request.method == 'GET':
+
+        return render_template('category_edit.html',
+                               category=category)
+
+    else:
+
+        if not request.form['category-name']:
+            return render_template('category_edit.html',
+                                   error='Invalid input',
+                                   message='Please enter a valid category.')
+        else:
+            category.name = request.form['category-name']
+            session.commit()
+
+        return redirect(url_for('index'))
 
 
 @app.route('/category/<int:category_id>/delete')
-def delete_category():
-    pass
+def delete_category(category_id):
+
+    category = session.query(Category).filter_by(id=category_id).one()
+    session.delete(category)
+    session.commit()
+
+    return redirect(url_for('index'))
 
 
 @app.route('/item/<int:item_id>')
 def view_item(item_id):
-
+    categories = session.query(Category).all()
     item = session.query(Item).filter_by(id=item_id).one()
+    category = session.query(Category).filter_by(id=item.category_id).one()
 
     return render_template('item_view.html',
-                           item=item)
+                           item=item,
+                           category=category,
+                           categories=categories)
+
 
 @app.route('/category/<int:category_id>/item/create', methods=['GET', 'POST'])
 def create_item(category_id):
@@ -100,9 +130,27 @@ def create_item(category_id):
             return redirect(url_for('view_category', category_id=category_id))
 
 
-@app.route('/category/<int:category_id>/item/edit')
-def edit_item():
-    return render_template('item_edit.html')
+@app.route('/item/<int:item_id>/edit', methods=['GET', 'POST'])
+def edit_item(item_id):
+    item = session.query(Item).filter_by(id=item_id).one()
+
+    if request.method == 'GET':
+
+        return render_template('item_edit.html',
+                               item=item)
+
+    else:
+
+        if not request.form['item-name']:
+            return render_template('item_edit.html',
+                                   error='Invalid input',
+                                   message='Please enter a valid name.')
+        else:
+            item.name = request.form['item-name']
+            item.description = request.form['item-description']
+            session.commit()
+
+        return redirect(url_for('index'))
 
 
 @app.route('/item/<int:item_id>/delete')
