@@ -154,10 +154,14 @@ def edit_item(item_id):
 
 
 @app.route('/item/<int:item_id>/delete')
-def delete_item():
-    pass
+def delete_item(item_id):
 
+    item = session.query(Item).filter_by(id=item_id).one()
 
+    session.delete(item)
+    session.commit()
+
+    return redirect(url_for('view_category', category_id=item.category_id))
 
 
 # Runs the server
