@@ -1,28 +1,32 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Create Item</h1>
 
-    <form action="{{ url_for('create_item', category_id=category.id) }}" method="post">
-        <div class="ui form">
+    <div class="ui segment centered">
+        <h1>Create Item in "{{ category.name }}"</h1>
 
-            <div class="field">
-                <input type="text" name='item-name' placeholder="item name">
+        <form action="{{ url_for('create_item', category_id=category.id) }}" method="post">
+            <div class="ui form">
+
+                <div class="field">
+                    <input type="text" name='item-name' placeholder="item name">
+                </div>
+
+                <div class="field">
+                    <textarea name="item-description" id="" cols="50" rows="10" placeholder="description"></textarea>
+                </div>
+
+                <button class="ui mini green right floated button">Save</button>
+                <a href="{{ url_for('view_category', category_id=category.id) }}" class="ui mini red right floated button">Cancel</a>
             </div>
+        </form>
 
-            <div class="field">
-                <textarea name="item-description" id="" cols="50" rows="10" placeholder="description"></textarea>
+        {% if error %}
+            <div class="ui negative message">
+                <div class="header">{{ error }}</div>
+                <p>{{ message }}</p>
             </div>
-
-            <button class="ui green button">Save</button>
-        </div>
-    </form>
-
-    {% if error %}
-        <div class="ui negative message">
-            <div class="header">{{ error }}</div>
-            <p>{{ message }}</p>
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 
 {% endblock %}

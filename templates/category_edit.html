@@ -2,25 +2,29 @@
 
 
 {% block content %}
-    <h1>Edit Category</h1>
 
-    <form action="{{ url_for('edit_category', category_id=category.id) }}" method="post">
-        <div class="ui form">
+    <div class="ui segment centered">
 
-            <div class="field">
-                <input type="text" name='category-name' placeholder="category name" value="{{ category.name }}">
+        <h1>Edit Category</h1>
+        <form action="{{ url_for('edit_category', category_id=category.id) }}" method="post">
+            <div class="ui form">
+
+                <div class="field">
+                    <input type="text" name='category-name' placeholder="category name" value="{{ category.name }}">
+                </div>
+
+                <button class="ui mini green right floated button">Save</button>
+                <a href="{{ url_for('index') }}" class="ui mini red right floated button">Cancel</a>
+
             </div>
+        </form>
 
-            <button class="ui green button">Save</button>
-        </div>
-    </form>
-
-    {% if error %}
-        <div class="ui negative message">
-            <div class="header">{{ error }}</div>
-            <p>{{ message }}</p>
-        </div>
-    {% endif %}
-
+        {% if error %}
+            <div class="ui negative message">
+                <div class="header">{{ error }}</div>
+                <p>{{ message }}</p>
+            </div>
+        {% endif %}
+    </div>
 
 {% endblock%}

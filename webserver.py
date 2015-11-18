@@ -135,7 +135,7 @@ def logout():
         response = make_response(json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['credentials']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print 'result is '
@@ -150,6 +150,12 @@ def logout():
         response.headers['Content-Type'] = 'application/json'
         return redirect(url_for('index'))
     else:
+
+        del login_session['credentials']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
         response = make_response(json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -167,9 +173,11 @@ def index():
 
 @app.route('/category/<int:category_id>')
 def view_category(category_id):
-
+    """
+        Returns a page listing items for a given category.
+    """
     category = session.query(Category).filter_by(id=category_id).one()
-    categories = session.query(Category).all()
+    categories = session.query(Category).order_by('name')
 
     items = session.query(Item).filter_by(category_id=category_id)
 
@@ -177,6 +185,26 @@ def view_category(category_id):
                            categories=categories,
                            category=category,
                            items=items)
+
+
+@app.route('/category/json')
+def view_category_json():
+    """
+        Returns a list of categories in JSON format
+    """
+    categories = session.query(Category).order_by('name')
+
+    return jsonify(items=[cat.serialize for cat in categories])
+
+
+@app.route('/category/<int:category_id>/items/json')
+def view_items_json(category_id):
+    """
+        Returns a list of items for a given category in JSON format
+    """
+    items = session.query(Item).filter_by(category_id=category_id)
+
+    return jsonify(items=[item.serialize for item in items])
 
 
 @app.route('/category/create', methods=['GET', 'POST'])
@@ -244,7 +272,7 @@ def view_item(item_id):
     """
         Show details for an item
     """
-    categories = session.query(Category).all()
+    categories = session.query(Category).order_by('name')
     item = session.query(Item).filter_by(id=item_id).one()
     category = session.query(Category).filter_by(id=item.category_id).one()
 
@@ -252,6 +280,16 @@ def view_item(item_id):
                            item=item,
                            category=category,
                            categories=categories)
+
+
+@app.route('/item/<int:item_id>/json')
+def view_item_json(item_id):
+    """
+        Returns a list of items for a given category in JSON format
+    """
+    item = session.query(Item).filter_by(id=item_id).one()
+
+    return jsonify(item.serialize)
 
 
 @app.route('/category/<int:category_id>/item/create', methods=['GET', 'POST'])

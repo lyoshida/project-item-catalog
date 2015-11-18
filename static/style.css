@@ -1,9 +1,33 @@
 /* General styles */
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #636363;
+}
+
+
 .hidden {
   display: none;
 }
 
 .cat-list {
   margin-top: 20px;
+}
+
+.segment.centered {
+  max-width: 600px;
+  margin: 100px auto 0;
+  overflow: auto;
+}
+
+
+/* Login */
+
+.segment.login {
+  height: 300px;
+  text-align: center;
 }
