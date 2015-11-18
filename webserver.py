@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 
 from flask import session as login_session
 import random
@@ -18,6 +18,8 @@ import json
 from flask import make_response
 import requests
 
+from functools import wraps
+
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 
@@ -29,6 +31,19 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 app = Flask(__name__)
+
+
+def login_required(f):
+    """
+        Decorator: Requires user to be logged in
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in login_session:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 
 @app.route('/login')
@@ -197,6 +212,7 @@ def view_category_json():
     return jsonify(items=[cat.serialize for cat in categories])
 
 
+
 @app.route('/category/<int:category_id>/items/json')
 def view_items_json(category_id):
     """
@@ -208,6 +224,7 @@ def view_items_json(category_id):
 
 
 @app.route('/category/create', methods=['GET', 'POST'])
+@login_required
 def create_category():
     """
         Form to create a new category
@@ -231,6 +248,7 @@ def create_category():
 
 
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
+@login_required
 def edit_category(category_id):
     """
         Form to edit a new category
@@ -256,6 +274,7 @@ def edit_category(category_id):
 
 
 @app.route('/category/<int:category_id>/delete')
+@login_required
 def delete_category(category_id):
     """
         Deletes a category
@@ -293,6 +312,7 @@ def view_item_json(item_id):
 
 
 @app.route('/category/<int:category_id>/item/create', methods=['GET', 'POST'])
+@login_required
 def create_item(category_id):
     """
         Create a new item
@@ -322,6 +342,7 @@ def create_item(category_id):
 
 
 @app.route('/item/<int:item_id>/edit', methods=['GET', 'POST'])
+@login_required
 def edit_item(item_id):
     """
         Edit an item
@@ -348,6 +369,7 @@ def edit_item(item_id):
 
 
 @app.route('/item/<int:item_id>/delete')
+@login_required
 def delete_item(item_id):
     """
         Delete an item

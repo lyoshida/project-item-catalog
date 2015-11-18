@@ -16,6 +16,16 @@ Use the command `pip install [package]` to install required packages:
  * requests
  * oauth2client
 
+ ### Setup Google+ login
+
+ Access https://console.developers.google.com/, and follow the steps shown in this page:
+ https://developers.google.com/+/web/signin/ to setup a Google+ login.
+
+ Remember to add http://localhost:5000 to the "Authorized JavaScript Origins"
+
+ Download the client secret file and place it in the root folder of the project.
+ Rename the file to `client_secrets.json`
+
  ### Loading the webserver
 
  Run the following command:
